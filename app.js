@@ -11,6 +11,7 @@ import User from './schema';
 import bcrypt from 'bcryptjs';
 import cookieParser from 'cookie-parser'
 import {OAuth2Client} from'google-auth-library';
+import nodemailer from 'nodemailer';
 
 import mongoose from 'mongoose';
 const uri = "mongodb+srv://Fawzy:fawzy@cluster0.83grs.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
@@ -71,14 +72,37 @@ app.post('/signupGoogle', async(req, res) => {
       }
     }
     else{
+      const confirmationMessage = "You have successfully signed up";
+      var mailTransporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "fawzyashraf201@gmail.com",
+          pass: "35024833502483"
+        }
+      });
+    
+      let mailDetails = {
+        from: 'fawzyashraf201@gmail.com',
+        to: payload.email,
+        subject: 'Test mail',
+        text: confirmationMessage
+      };
+    
+    
+      mailTransporter.sendMail(mailDetails, async (err, data)=> {
+          if(err) {
+              console.log(err);
+          } else{
+              console.log('Email sent successfully');
+              const encryptedPassword = await bcrypt.hash(password, 10);
+              user = User({ username: username, password: encryptedPassword });
+              await user.save();
 
-      const encryptedPassword = await bcrypt.hash(password, 10);
-      user = User({ username: username, password: encryptedPassword });
-      await user.save();
-
-      //res.cookie('session-token', token);
-      res.cookie('username', username);   //replace with tokens later
-      res.redirect('/');
+              //res.cookie('session-token', token);
+              res.cookie('username', username);   //replace with tokens later
+              res.redirect('/');
+            }
+      });
    }
   }
   verify().catch(console.error);
