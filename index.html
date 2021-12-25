@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>chat app</title>
+    <meta name="google-signin-client_id" content="1051843467112-r0qk7f7tnhljpnih78tv478lp9oqs5fq.apps.googleusercontent.com">
+</head>
+    <body>
+        <button><a href="/login">login</a></button>
+        <p>or</p>
+        <button><a href="/signup">signup</a></button>
+    </body>
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script>
+        function onSignIn(googleUser) {
+            var id_token = googleUser.getAuthResponse().id_token;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/signupGoogle');
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                //console.log('Signed in as: ' + xhr.responseText);
+            };
+            xhr.send('idtoken=' + id_token);
+        }
+    </script>
+
+</html>
